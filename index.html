@@ -20,7 +20,7 @@
         theme: {
           extend: {
             fontFamily: {
-              mono: ['"IBM Plex Mono"', "monospace"],
+              serifclean: ['"IBM Plex Mono"', "monospace"],
             },
             colors: {
               ink: "#020202",
@@ -42,7 +42,7 @@
       };
     </script>
   </head>
-  <body class="min-h-screen bg-shell font-mono text-zinc-100 antialiased">
+  <body class="min-h-screen bg-shell font-serifclean text-zinc-100 antialiased">
     <header id="site-header" class="sticky top-0 z-20 border-b border-white/10 bg-black/90 backdrop-blur-xl transition-all duration-300">
       <div id="site-header-inner" class="mx-auto flex w-[min(1120px,calc(100%-3rem))] items-center justify-center px-4 py-4 sm:px-6 md:px-0">
         <nav
@@ -50,10 +50,10 @@
           id="site-nav"
           class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-full border border-white/10 bg-white/[0.03] px-5 py-3 text-[0.92rem] text-mist shadow-[0_10px_30px_rgba(0,0,0,0.25)] transition-all duration-300"
         >
-          <a href="#about" class="transition hover:text-white">about</a>
-          <a href="#experience" class="transition hover:text-white">experience</a>
-          <a href="#publications" class="transition hover:text-white">publications</a>
-          <a href="#contact" class="transition hover:text-white">contact</a>
+          <a href="#about" class="transition hover:text-white">About</a>
+          <a href="#experience" class="transition hover:text-white">Experience</a>
+          <a href="#publications" class="transition hover:text-white">Publications</a>
+          <a href="#contact" class="transition hover:text-white">Contact</a>
         </nav>
       </div>
     </header>
@@ -69,7 +69,7 @@
             Parth Diwane
           </h1>
           <p class="mt-6 max-w-2xl text-[1rem] leading-8 text-mist">
-            I research emboided AI, mulit-agent collaboration, AI agents, and reinforcement learning
+            I research embodied AI, multi-agent collaboration, AI agents, and reinforcement learning
           </p>
         </div>
 
@@ -146,6 +146,25 @@
 
           <article class="reveal grid gap-3 border-b border-line py-6 md:grid-cols-[200px_minmax(0,1fr)] md:gap-6">
             <div class="text-[0.88rem] text-mist">
+              <p>Oct 2025 - March 2026</p>
+              <a
+                href="https://aws.amazon.com/ai/"
+                target="_blank"
+                rel="noreferrer"
+                class="mt-3 inline-block border-b border-transparent pb-1 text-sm text-mist transition hover:border-white hover:text-white"
+                >Amazon</a
+              >
+            </div>
+            <div>
+              <h3 class="inline-block text-lg text-white">AI Researcher</h3>
+              <p class="mt-3 leading-8 text-mist">
+                Worked on embodied AI benchmarks involing multi-agent collaboration and theory of mind
+              </p>
+            </div>
+          </article>
+
+          <article class="reveal grid gap-3 border-b border-line py-6 md:grid-cols-[200px_minmax(0,1fr)] md:gap-6">
+            <div class="text-[0.88rem] text-mist">
               <p>Oct 2025 - Present</p>
             </div>
             <div>
@@ -176,7 +195,7 @@
             <div>
               <h3 class="inline-block text-lg text-white">Computer Networking Researcher</h3>
               <p class="mt-3 leading-8 text-mist">
-                researched BGP protocol and hijacking attacks on bgp.
+                Researched BGP protocol and hijacking attacks on BGP.
               </p>
             </div>
           </article>
@@ -187,7 +206,7 @@
         <div class="mb-6">
           <p class="mb-4 text-[0.8rem] uppercase tracking-[0.2em] text-mist">selected builds</p>
           <h2 class="max-w-[16ch] text-4xl leading-tight tracking-[-0.04em] md:text-[3.4rem]">
-            projects
+            Projects
           </h2>
         </div>
 
@@ -196,7 +215,7 @@
             <p class="mb-2 text-[0.78rem] uppercase tracking-[0.18em] text-mist">01</p>
             <h3 class="text-lg text-white">EmToM</h3>
             <p class="mt-2 leading-7 text-mist">
-              benchmark for multi-agent collaboration in an embodied (<a href="https://github.com/facebookresearch/partnr-planner" target="_blank" rel="noreferrer" class="border-b border-transparent pb-0.5 text-white transition hover:border-white">Partnr</a>) setting
+              benchmark for multi-agent collaboration in an embodied (<a href="https://github.com/facebookresearch/partnr-planner" target="_blank" rel="noreferrer" class="border-b border-transparent pb-0.5 text-white transition hover:border-white">Partnr</a>) setting.
             </p>
           </article>
           <article class="reveal min-h-[180px] border border-line bg-panel p-5 shadow-panel">
@@ -211,7 +230,7 @@
               >
             </h3>
             <p class="mt-2 leading-7 text-mist">
-              counting cards using cv, meta glasses, and MiDaS model.
+              counting cards using CV, Meta glasses, and the MiDaS model.
             </p>
           </article>
           <article class="reveal min-h-[180px] border border-line bg-panel p-5 shadow-panel">
@@ -241,7 +260,7 @@
               >
             </h3>
             <p class="mt-2 leading-7 text-mist">
-              Reinforcement learning project for training an agent to navigate a maze environment.
+              reinforcement learning project for training an agent to navigate a maze environment.
             </p>
           </article>
         </div>
