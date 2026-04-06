@@ -1,17 +1,12 @@
 # parthdev-website
 
-Simple static portfolio site.
+Next.js portfolio site for Vercel deployment.
 
-## Structure
-
-- `index.html`: main single-page site
-- `assets/js/main.js`: scroll reveal, smooth scrolling, and compact header behavior
-
-## Local preview
+## Local development
 
 ```bash
-cd /Users/parth/coding/projs/parthdev-website
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-Open `http://localhost:8000`.
+Open `http://localhost:3000`.
