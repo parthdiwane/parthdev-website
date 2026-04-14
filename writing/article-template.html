@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Writing Title</title>
+    <meta
+      name="description"
+      content="Short description of the piece."
+    />
+    <link rel="icon" type="image/jpeg" href="../gojored.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600;6..96,700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              serifdisplay: ['"Bodoni Moda"', "Georgia", "serif"],
+            },
+            colors: {
+              ink: "#000000",
+              mist: "#5f584f",
+              bone: "#EEF2F7",
+              boneSoft: "#f8fbff",
+              line: "rgba(17,17,17,0.12)",
+              lineStrong: "rgba(17,17,17,0.24)",
+            },
+            boxShadow: {
+              panel: "0 22px 60px rgba(47, 37, 24, 0.08)",
+            },
+            backgroundImage: {
+              shell:
+                "radial-gradient(circle at top left, rgba(255,255,255,0.58), transparent 30%), radial-gradient(circle at top right, rgba(221,230,241,0.75), transparent 34%), linear-gradient(180deg, #f8fbff 0%, #EEF2F7 100%)",
+              panel:
+                "linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.44))",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-shell font-serifdisplay text-ink antialiased">
+    <main class="mx-auto w-[min(820px,calc(100%-2rem))] px-4 py-8 sm:px-6 md:px-8 md:py-10">
+      <a href="../index.html#writing" class="text-sm uppercase tracking-[0.16em] text-mist transition hover:text-ink">
+        Back to home
+      </a>
+
+      <article class="mt-8">
+        <p class="text-[0.8rem] uppercase tracking-[0.2em] text-mist">category</p>
+        <h1 class="mt-3 text-5xl leading-[0.95] tracking-[-0.05em] md:text-[4.8rem]">
+          Your Writing Title
+        </h1>
+        <p class="mt-5 text-sm uppercase tracking-[0.16em] text-mist">Written Month Day, Year</p>
+        <p class="mt-6 text-lg leading-8 text-mist">
+          Short one-paragraph summary of the piece.
+        </p>
+
+        <div class="mt-10 space-y-6 text-[1.02rem] leading-8 text-mist">
+          <p>
+            Start writing here.
+          </p>
+          <p>
+            Add as many paragraphs or sections as you need.
+          </p>
+        </div>
+      </article>
+    </main>
+  </body>
+</html>
