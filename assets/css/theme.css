@@ -1,0 +1,44 @@
+:root {
+  color-scheme: light;
+  --ink: #111111;
+  --mist: #5f584f;
+  --bone: #eef2f7;
+  --bone-soft: #f8fbff;
+  --surface-muted: rgba(255, 255, 255, 0.6);
+  --line: rgba(17, 17, 17, 0.12);
+  --line-strong: rgba(17, 17, 17, 0.24);
+  --shadow-panel: 0 22px 60px rgba(47, 37, 24, 0.08);
+  --bg-shell:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.58), transparent 30%),
+    radial-gradient(circle at top right, rgba(221, 230, 241, 0.75), transparent 34%),
+    linear-gradient(180deg, #f8fbff 0%, #eef2f7 100%);
+  --bg-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.44));
+  --inverse: #111111;
+  --inverse-text: #ffffff;
+}
+
+html.dark {
+  color-scheme: dark;
+  --ink: #ede8dc;
+  --mist: #666666;
+  --bone: #0e0e0e;
+  --bone-soft: #060606;
+  --surface-muted: rgba(255, 255, 255, 0.06);
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.18);
+  --shadow-panel: 0 24px 60px rgba(0, 0, 0, 0.7);
+  --bg-shell: #060606;
+  --bg-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+  --inverse: #ede8dc;
+  --inverse-text: #060606;
+}
+
+body {
+  transition: background-image 180ms ease, color 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+}
