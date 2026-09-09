@@ -10,13 +10,49 @@
       content="Parth Diwane — AI researcher and engineer. Experience, projects, publications, and contact."
     />
     <link rel="icon" type="image/jpeg" href="gojored.jpg" />
+
+    <!-- Applied before first paint so a stored technique theme never flashes
+         the default palette on reload. Keep in sync with assets/js/theme.js. -->
+    <script>
+      (function () {
+        var SCHEME = { sakura: "light", void: "light", sharingan: "dark" };
+        var name = "default";
+        try {
+          var stored = localStorage.getItem("pd-theme");
+          if (SCHEME[stored]) name = stored;
+        } catch (error) {}
+        var root = document.documentElement;
+        root.setAttribute("data-theme", name);
+        root.style.colorScheme = SCHEME[name] || "dark";
+
+        // Fallback release. This snippet always runs, so it can leave a theme
+        // applied even if the module never loads -- which would otherwise
+        // strand someone in a palette with no way back. The module claims the
+        // control when it boots and this steps aside.
+        document.addEventListener("click", function (event) {
+          if (window.__pdThemeReady || !event.target.closest) return;
+          if (!event.target.closest("[data-theme-release]")) return;
+          try { localStorage.removeItem("pd-theme"); } catch (error) {}
+          root.setAttribute("data-theme", "default");
+          root.style.colorScheme = "dark";
+        });
+      })();
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <!-- Incantation face only. display=block, because a swap part-way through
+         a 1.2s reveal would land in the middle of the shot. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&display=block"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="assets/css/theme.css" />
+    <link rel="stylesheet" href="assets/css/technique.css" />
   </head>
   <body class="is-loading">
     <div class="preloader" id="preloader" role="status" aria-live="polite">
@@ -26,128 +62,153 @@
       </div>
     </div>
 
-    <nav class="nav" aria-label="Primary">
-      <div class="nav__inner">
-        <h1 class="nav__name reveal"><a href="#about">Parth Diwane</a></h1>
-        <div class="nav__links">
-        <a class="nav__link" href="#about">About</a>
-        <a class="nav__link" href="#experience">Experience</a>
-        <a class="nav__link" href="#papers">Papers</a>
-        <a class="nav__link" href="#contact">Contact</a>
-        </div>
-      </div>
-    </nav>
-
-    <main class="wrap">
-      <section id="about">
-        <p class="reveal">
-          hello! i'm parth, currently i work at ucsb's ai (nlp) group where i research embodied ai, rl, and
-          llm agents. if you are interested in my work feel free to reach out on my
-          <a
-            class="link"
-            href="https://www.linkedin.com/in/parth-diwane-497793254/"
-            target="_blank"
-            rel="noreferrer"
-            >linkedin</a
-          >
-          or
-          <a class="link" href="mailto:parthdiwane@ucsb.edu">email me</a>.
-        </p>
-      </section>
-
-      <section id="experience">
-        <p class="label reveal">experience</p>
-
-        <div class="entries">
-          <article class="entry reveal">
-            <p class="entry__company">
-              <a class="link" href="https://www.cisco.com/" target="_blank" rel="noreferrer">Cisco</a>
-            </p>
-            <p class="entry__role">mle intern <span class="entry__meta">&middot; summer 2026</span></p>
-            <p class="entry__body">worked on building classifcation models for assurance related tasks</p>
-          </article>
-
-          <article class="entry reveal">
-            <p class="entry__company">
-              <a class="link" href="http://nlp.cs.ucsb.edu/" target="_blank" rel="noreferrer"
-                >ucsb ai (nlp) group</a
-              >
-            </p>
-            <p class="entry__role">undergrad researcher <span class="entry__meta">&middot; oct 2025 &mdash; present</span></p>
-            <p class="entry__body">
-              currently researching embodied ai, rl, and llm agent. advised by Xin (Eric) Wang
-            </p>
-          </article>
-        </div>
-
-        <div class="subblock">
-          <h3 class="reveal">projects</h3>
-          <div class="projects">
-            <div class="project reveal">
-              <a
-                class="link project__name"
-                href="https://github.com/parthdiwane/gpt-zero"
-                target="_blank"
-                rel="noreferrer"
-                >gpt-zero</a
-              >
-              <span class="project__desc">building gpt-2 form scratch using only numpy</span>
-            </div>
-            <div class="project reveal">
-              <span class="project__name">novel-idea</span>
-              <span class="project__desc">[in-progress]</span>
-            </div>
-            <div class="project reveal">
-              <a
-                class="link project__name"
-                href="https://github.com/parthdiwane/card-counter"
-                target="_blank"
-                rel="noreferrer"
-                >card-counter</a
-              >
-              <span class="project__desc">counting cards in blackjacks using meta-glasses</span>
-            </div>
-            <div class="project reveal">
-              <span class="project__name">humanoid</span>
-              <span class="project__desc">[in-progress]</span>
-            </div>
+    <div class="page">
+      <nav class="nav" aria-label="Primary">
+        <div class="nav__inner">
+          <h1 class="nav__name reveal"><a href="#about">Parth Diwane</a></h1>
+          <div class="nav__links">
+          <a class="nav__link" href="#about">About</a>
+          <a class="nav__link" href="#experience">Experience</a>
+          <a class="nav__link" href="#papers">Papers</a>
+          <a class="nav__link" href="#contact">Contact</a>
           </div>
         </div>
-      </section>
+      </nav>
 
-      <section id="papers">
-        <p class="label reveal">papers</p>
+      <main class="wrap">
+        <section id="about">
+          <p class="reveal">
+            hello! i'm parth, currently i work at ucsb's ai (nlp) group where i research embodied ai, rl, and
+            llm agents. outside of the cs space i enjoy working out, watching anime [top 3:
+            <button
+              type="button"
+              class="tech-trigger"
+              data-technique="bleach"
+              aria-label="Play the Bleach animation and switch the site to its color theme."
+            >bleach</button>,
+            <button
+              type="button"
+              class="tech-trigger"
+              data-technique="jjk"
+              aria-label="Play the Jujutsu Kaisen animation and switch the site to its color theme."
+            >jjk</button>, and
+            <button
+              type="button"
+              class="tech-trigger"
+              data-technique="naruto"
+              aria-label="Play the Naruto animation and switch the site to its color theme. Plays a short sound."
+            >naruto</button>], and spending time with friends. if you are interested in my work feel free to reach out on my
+            <a
+              class="link"
+              href="https://www.linkedin.com/in/parth-diwane-497793254/"
+              target="_blank"
+              rel="noreferrer"
+              >linkedin</a
+            >
+            or
+            <a class="link" href="mailto:parthdiwane@ucsb.edu">email me</a>.
+          </p>
+        </section>
 
-        <div class="entries">
-          <article class="entry reveal">
-            <h2>
-              <a class="link" href="https://enact-tom.github.io/" target="_blank" rel="noreferrer"
-                >EnactToM: An Evolving Benchmark for Functional Theory of Mind in Embodied Agents</a
-              >
-            </h2>
-            <p class="entry__body">
-              Gurusha Juneja, Dylan Lu, Saaket Agashe, <strong>Parth Diwane</strong>, Xin Eric Wang
-            </p>
-            <p class="entry__body">Accepted to the ICML AI for Good (AI4Good) Workshop.</p>
-          </article>
-        </div>
-      </section>
+        <section id="experience">
+          <p class="label reveal">experience</p>
 
-      <section id="contact">
-        <p class="label reveal">Contact</p>
-        <div class="contact">
-          <a
-            class="link reveal"
-            href="https://www.linkedin.com/in/parth-diwane-497793254/"
-            target="_blank"
-            rel="noreferrer"
-            >LinkedIn</a
-          >
-          <a class="link reveal" href="mailto:parthdiwane@ucsb.edu">Email</a>
-        </div>
-      </section>
-    </main>
+          <div class="entries">
+            <article class="entry reveal">
+              <p class="entry__company">
+                <a class="link" href="https://www.cisco.com/" target="_blank" rel="noreferrer">cisco</a>
+              </p>
+              <p class="entry__role">mle intern <span class="entry__meta">&middot; summer 2026</span></p>
+              <p class="entry__body">worked on building classifcation models for assurance related tasks</p>
+            </article>
+
+            <article class="entry reveal">
+              <p class="entry__company">
+                <a class="link" href="http://nlp.cs.ucsb.edu/" target="_blank" rel="noreferrer"
+                  >ucsb ai (nlp) group</a
+                >
+              </p>
+              <p class="entry__role">undergrad researcher <span class="entry__meta">&middot; oct 2025 &mdash; present</span></p>
+              <p class="entry__body">
+                currently researching embodied ai, rl, and llm agent. advised by Xin (Eric) Wang
+              </p>
+            </article>
+          </div>
+
+          <div class="subblock">
+            <h3 class="reveal">projects</h3>
+            <div class="projects">
+              <div class="project reveal">
+                <a
+                  class="link project__name"
+                  href="https://github.com/parthdiwane/gpt-zero"
+                  target="_blank"
+                  rel="noreferrer"
+                  >gpt-zero</a
+                >
+                <span class="project__desc">building gpt-2 form scratch using only numpy</span>
+              </div>
+              <div class="project reveal">
+                <span class="project__name">novel-idea</span>
+                <span class="project__desc">[in-progress]</span>
+              </div>
+              <div class="project reveal">
+                <a
+                  class="link project__name"
+                  href="https://github.com/parthdiwane/card-counter"
+                  target="_blank"
+                  rel="noreferrer"
+                  >card-counter</a
+                >
+                <span class="project__desc">counting cards in blackjacks using meta-glasses</span>
+              </div>
+              <div class="project reveal">
+                <span class="project__name">humanoid</span>
+                <span class="project__desc">[in-progress]</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="papers">
+          <p class="label reveal">papers</p>
+
+          <div class="entries">
+            <article class="entry reveal">
+              <h2>
+                <a class="link" href="https://enact-tom.github.io/" target="_blank" rel="noreferrer"
+                  >EnactToM: An Evolving Benchmark for Functional Theory of Mind in Embodied Agents</a
+                >. ICML AI4GOOD
+              </h2>
+              <p class="entry__body">
+                Gurusha Juneja, Dylan Lu, Saaket Agashe, <strong>Parth Diwane</strong>, Xin Eric Wang
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section id="contact">
+          <p class="label reveal">Contact</p>
+          <div class="contact">
+            <a
+              class="link reveal"
+              href="https://www.linkedin.com/in/parth-diwane-497793254/"
+              target="_blank"
+              rel="noreferrer"
+              >LinkedIn</a
+            >
+            <a class="link reveal" href="mailto:parthdiwane@ucsb.edu">Email</a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-foot">
+        <button type="button" class="foot-ctl foot-ctl--release" data-theme-release>release</button>
+        <button type="button" class="foot-ctl" data-sound-toggle aria-pressed="false">sound on</button>
+      </footer>
+    </div>
 
     <script src="assets/js/main.js"></script>
+    <script type="module" src="assets/js/technique/index.js"></script>
   </body>
 </html>

@@ -1,0 +1,458 @@
+/* ==========================================================================
+   Technique sequences — triggers, incantation typography, dissolve / return,
+   canvas layer, footer controls.
+
+   Loaded after theme.css so the dissolve rules win the cascade over .reveal.
+   ========================================================================== */
+
+/* Registered so the underline colour can actually interpolate on hover, and
+   inheriting so ::after (the glow bar) resolves the same value the button has.
+   Browsers without @property still get the colour change, just instantly. */
+@property --tc {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #888888;
+}
+
+@property --tc-hi {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #cccccc;
+}
+
+/* --------------------------------------------------------------------------
+   triggers
+   -------------------------------------------------------------------------- */
+
+.tech-trigger {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0 0 3px;
+  border: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  font: inherit;
+  line-height: 1; /* keeps the inline-block out of the paragraph's line box */
+  vertical-align: baseline;
+  color: var(--text-strong);
+  cursor: inherit;
+  text-shadow: 0 0 0 transparent;
+
+  /* the 2px underline itself */
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--tc) 16%,
+    var(--tc-hi) 50%,
+    var(--tc) 84%,
+    transparent 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 0;
+  background-position: 0 100%;
+
+  transition: color 180ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    text-shadow 180ms cubic-bezier(0.2, 0.7, 0.3, 1), --tc 180ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    --tc-hi 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* the glow, blurred underneath the crisp line */
+.tech-trigger::after {
+  content: "";
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--tc-hi) 22%, var(--tc-hi) 78%, transparent 100%);
+  opacity: 0;
+  filter: blur(4px);
+  pointer-events: none;
+  transition: opacity 180ms cubic-bezier(0.2, 0.7, 0.3, 1), filter 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.tech-trigger:hover,
+.tech-trigger:focus-visible {
+  color: var(--tc-hi);
+  text-shadow: 0 0 10px var(--tc-glow);
+}
+
+.tech-trigger:hover::after,
+.tech-trigger:focus-visible::after {
+  opacity: 0.9;
+  filter: blur(5px);
+}
+
+.tech-trigger:focus-visible {
+  outline: 2px solid var(--tc-hi);
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+.tech-trigger[disabled] {
+  pointer-events: none;
+}
+
+/* The affordance only appears once the module that honours it has booted.
+   Without it these are plain words in the sentence, not dead buttons. */
+html.js-technique .tech-trigger {
+  background-size: 100% 2px;
+  cursor: pointer;
+}
+
+html:not(.js-technique) .tech-trigger {
+  display: inline;
+}
+
+html:not(.js-technique) .tech-trigger::after {
+  display: none;
+}
+
+.tech-trigger[data-technique="bleach"] {
+  --tc: #c4718f;
+  --tc-hi: #ff9ec4;
+  --tc-glow: rgba(255, 158, 196, 0.55);
+}
+
+.tech-trigger[data-technique="bleach"]:hover,
+.tech-trigger[data-technique="bleach"]:focus-visible {
+  --tc: #ff9ec4;
+  --tc-hi: #ffd9e7;
+}
+
+.tech-trigger[data-technique="jjk"] {
+  --tc: #5e9cbe;
+  --tc-hi: #7fd4ff;
+  --tc-glow: rgba(127, 212, 255, 0.55);
+}
+
+.tech-trigger[data-technique="jjk"]:hover,
+.tech-trigger[data-technique="jjk"]:focus-visible {
+  --tc: #7fd4ff;
+  --tc-hi: #d3f1ff;
+}
+
+.tech-trigger[data-technique="naruto"] {
+  --tc: #b84a4a;
+  --tc-hi: #ff4d4d;
+  --tc-glow: rgba(224, 27, 36, 0.6);
+}
+
+.tech-trigger[data-technique="naruto"]:hover,
+.tech-trigger[data-technique="naruto"]:focus-visible {
+  --tc: #ff4d4d;
+  --tc-hi: #ffb0b0;
+}
+
+/* --------------------------------------------------------------------------
+   sequence chrome
+   -------------------------------------------------------------------------- */
+
+/* Scroll lock. Pinning the body rather than hiding html's overflow keeps the
+   page visually where it was -- otherwise it snaps to the top mid-dissolve,
+   while the content is still visible. --scrollbar-w replaces the width the
+   scrollbar gave up so nothing reflows. */
+html.is-sequence {
+  overflow: hidden;
+}
+
+html.is-sequence body {
+  position: fixed;
+  top: var(--lock-top, 0px);
+  left: 0;
+  right: var(--scrollbar-w, 0px);
+  overflow: hidden;
+}
+
+html.is-paused .incant .glyph {
+  animation-play-state: paused;
+}
+
+html.is-sequence .page {
+  transform: translate3d(var(--shake-x, 0px), var(--shake-y, 0px), 0) scale(var(--ghost-scale, 1));
+}
+
+/* Beat 1 of the domain expansion: the page comes back as a warped ghost for
+   the bubble to swallow, instead of being flatly absent. */
+.page--ghost {
+  opacity: var(--ghost-o, 1);
+  filter: blur(var(--ghost-blur, 0px)) saturate(0.3) brightness(1.35);
+}
+
+.dissolve-unit {
+  will-change: opacity, filter;
+}
+
+html.is-sequence .dissolve-unit {
+  transition: opacity var(--dsv-dur, 340ms) var(--dsv-ease, cubic-bezier(0.4, 0, 0.6, 0.15)),
+    filter var(--dsv-dur, 340ms) var(--dsv-ease, cubic-bezier(0.4, 0, 0.6, 0.15));
+  transition-delay: var(--dsv-delay, 0ms);
+}
+
+html.is-dissolved .dissolve-unit {
+  opacity: var(--dsv-floor, 0);
+  filter: blur(6px);
+}
+
+.technique-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  opacity: 1;
+  will-change: opacity;
+}
+
+.technique-canvas.is-washing {
+  opacity: 0;
+  transition: opacity var(--wash-dur, 800ms) cubic-bezier(0.35, 0, 0.65, 1);
+}
+
+/* --------------------------------------------------------------------------
+   incantation
+   -------------------------------------------------------------------------- */
+
+.incant {
+  position: fixed;
+  inset: 0;
+  z-index: 92;
+  display: grid;
+  place-items: center;
+  padding: 0 5vw;
+  pointer-events: none;
+  text-align: center;
+  font-family: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Songti SC", Georgia,
+    "Times New Roman", serif;
+  font-weight: 600;
+  color: var(--inc-core);
+  -webkit-font-smoothing: antialiased;
+}
+
+.incant__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.5rem, 1.6vw, 1.1rem);
+  max-width: 100%;
+}
+
+.incant__line {
+  margin: 0;
+  line-height: 1.22;
+  text-shadow: 0 0 4px var(--inc-core), 0 0 14px var(--inc-core), 0 0 40px var(--inc-halo);
+}
+
+.incant__line--word {
+  --tracking: 0.44em;
+  font-size: clamp(0.66rem, 2vw, 1rem);
+  font-weight: 500;
+  /* the tracking hangs a gap off the last glyph; pull it back so the line
+     still reads as optically centred */
+  margin-right: calc(var(--tracking) * -1);
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+
+.incant__line--name {
+  --tracking: 0.015em;
+  font-size: clamp(1.45rem, 6vw, 4.1rem);
+  font-weight: 600;
+  margin-right: calc(var(--tracking) * -1);
+}
+
+.incant .glyph {
+  display: inline-block;
+  white-space: pre;
+  letter-spacing: var(--tracking, 0);
+  opacity: 0;
+  will-change: opacity, transform, filter;
+}
+
+/* The stack is built during DISSOLVE so the font and layout are already
+   resolved; `is-live` is what releases the reveal on the INCANT beat. */
+.incant.is-live .glyph {
+  animation: glyph-in var(--glyph-dur, 520ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i) * var(--glyph-stagger, 45ms));
+}
+
+@keyframes glyph-in {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(14px);
+    letter-spacing: 0.4em;
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+    letter-spacing: var(--tracking, 0);
+  }
+}
+
+/* --- dispersal, one per show ------------------------------------------- */
+
+/* Bleach: each glyph breaks up where it stands while the renderer spawns a
+   petal cluster from its rect. */
+.incant.is-live.incant--shatter .glyph {
+  animation: glyph-shatter 560ms cubic-bezier(0.32, 0, 0.68, 0.6) both;
+  animation-delay: calc(var(--i) * 15ms);
+}
+
+@keyframes glyph-shatter {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+
+  35% {
+    opacity: 0.62;
+    filter: blur(1.5px);
+    transform: translateY(-2px) scale(1.03);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(-12px) scale(1.08);
+  }
+}
+
+/* JJK: pulled toward the vanishing point, accelerating, blur climbing. */
+.incant.is-live.incant--implode .glyph {
+  animation: glyph-implode 780ms cubic-bezier(0.55, 0, 0.85, 0.35) both;
+  animation-delay: calc(var(--i) * 7ms);
+}
+
+@keyframes glyph-implode {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) scale(1);
+  }
+
+  60% {
+    opacity: 0.7;
+    filter: blur(5px);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(16px);
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(0.16);
+  }
+}
+
+/* Naruto: a hard overexposure sweeps left to right and burns each glyph out. */
+.incant.is-live.incant--burn .glyph {
+  animation: glyph-burn 340ms cubic-bezier(0.7, 0, 0.9, 0.4) both;
+  animation-delay: calc(var(--i) * 17ms);
+}
+
+@keyframes glyph-burn {
+  0% {
+    opacity: 1;
+    color: var(--inc-core);
+    transform: none;
+    filter: blur(0);
+  }
+
+  18% {
+    opacity: 1;
+    color: #ffffff;
+    text-shadow: 0 0 6px #ffffff, 0 0 26px var(--inc-core), 0 0 64px var(--inc-halo);
+    transform: translateY(-1px) scale(1.045);
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 0;
+    color: #ffffff;
+    text-shadow: 0 0 2px transparent;
+    transform: translateY(3px) scale(0.97);
+    filter: blur(4px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   footer controls
+   -------------------------------------------------------------------------- */
+
+.site-foot {
+  margin: 0 auto;
+  max-width: var(--max);
+  padding: 0 24px 44px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .site-foot {
+    padding: 0 20px 52px;
+  }
+}
+
+.foot-ctl {
+  margin: 0;
+  padding: 2px 0;
+  border: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  color: var(--text-dim);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 180ms cubic-bezier(0.2, 0.7, 0.3, 1), color 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.foot-ctl:hover,
+.foot-ctl:focus-visible {
+  opacity: 1;
+  color: var(--text-strong);
+}
+
+.foot-ctl:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+/* Release is tied to the theme, never to the module: the pre-paint snippet in
+   <head> can apply a stored theme even if the module fails to load, and there
+   has to be a way back out of it in that case. */
+html:not([data-theme="sakura"]):not([data-theme="void"]):not([data-theme="sharingan"])
+  .foot-ctl--release {
+  display: none;
+}
+
+/* The sound toggle only means something while the module is live. */
+html:not(.js-technique) [data-sound-toggle] {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   reduced motion — the sequence never runs, so only the trigger affordance
+   and the footer need to stay sane.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .tech-trigger,
+  .tech-trigger::after,
+  .foot-ctl {
+    transition-duration: 1ms;
+  }
+}
