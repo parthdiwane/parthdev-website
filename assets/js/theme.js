@@ -1,14 +1,21 @@
-/* Theme application + persistence.
+/* Theme application.
 
-   The matching pre-paint snippet is inlined in each page's <head>; it must
-   stay in sync with THEMES and STORAGE_KEY below. Everything here assumes the
-   attribute is already present, so there is never a flash of the old palette. */
+   A technique theme lasts for the visit and no longer. The site's own dark
+   palette is what every load starts from, so there is nothing to persist and
+   no pre-paint snippet to keep in sync. */
 
-export const STORAGE_KEY = "pd-theme";
 export const THEMES = ["default", "sakura", "void", "sharingan"];
 
 const root = document.documentElement;
 let shiftTimer = 0;
+
+/* Clear the key earlier builds wrote, so anyone carrying a stored theme is
+   not left wondering why their site is pink. */
+try {
+  localStorage.removeItem("pd-theme");
+} catch (error) {
+  /* storage unavailable; nothing to clear */
+}
 
 export const currentTheme = () => {
   const value = root.getAttribute("data-theme");
@@ -17,7 +24,7 @@ export const currentTheme = () => {
 
 /* `duration` covers the blanket transition window in theme.css: 400ms normally,
    300ms for the reduced-motion crossfade. Passing 0 swaps with no transition. */
-export const applyTheme = (name, { duration = 400, persist = true } = {}) => {
+export const applyTheme = (name, { duration = 400 } = {}) => {
   const theme = THEMES.includes(name) ? name : "default";
 
   window.clearTimeout(shiftTimer);
@@ -31,18 +38,7 @@ export const applyTheme = (name, { duration = 400, persist = true } = {}) => {
   }
 
   root.setAttribute("data-theme", theme);
-
-  if (persist) {
-    try {
-      if (theme === "default") {
-        localStorage.removeItem(STORAGE_KEY);
-      } else {
-        localStorage.setItem(STORAGE_KEY, theme);
-      }
-    } catch (error) {
-      /* Private browsing / disabled storage. The theme still applies. */
-    }
-  }
+  root.style.colorScheme = theme === "sakura" || theme === "void" ? "light" : "dark";
 
   if (duration > 0) {
     shiftTimer = window.setTimeout(() => {

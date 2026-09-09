@@ -12,10 +12,9 @@ const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 const orchestrator = triggers.length ? new Orchestrator({ configs: CONFIGS, triggers, page }) : null;
 
-/* Signals to the stylesheet that the sequence machinery is live, and stands
-   the <head> fallback release handler down now that this one exists. */
+/* Signals to the stylesheet that the sequence machinery is live, so the
+   trigger underlines and the sound toggle can present themselves. */
 document.documentElement.classList.add("js-technique");
-window.__pdThemeReady = true;
 
 triggers.forEach((trigger) => {
   const config = CONFIGS[trigger.dataset.technique];

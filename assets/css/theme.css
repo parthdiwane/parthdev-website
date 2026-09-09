@@ -26,6 +26,9 @@
   --hairline: rgba(255, 255, 255, 0.07);
   --muted: #6f6f76;
   --nav-fill: rgba(35, 35, 38, 0.85);
+  --rule: rgba(255, 255, 255, 0.4);
+  --rule-hi: #ffffff;
+  --rule-glow: rgba(255, 255, 255, 0.45);
   --veil: rgba(255, 255, 255, 0.05);
   --panel-fill: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
   --panel-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
@@ -51,6 +54,9 @@
   --hairline: rgba(216, 27, 96, 0.1);
   --muted: #9b5570;
   --nav-fill: rgba(255, 255, 255, 0.86);
+  --rule: rgba(20, 6, 12, 0.3);
+  --rule-hi: #14060c;
+  --rule-glow: rgba(20, 6, 12, 0.28);
   --veil: rgba(216, 27, 96, 0.05);
   --panel-fill: linear-gradient(180deg, rgba(216, 27, 96, 0.05), rgba(216, 27, 96, 0.02));
   --panel-shadow: 0 24px 60px rgba(216, 27, 96, 0.12);
@@ -73,6 +79,9 @@
   --hairline: rgba(13, 52, 80, 0.1);
   --muted: #356279;
   --nav-fill: rgba(246, 251, 255, 0.86);
+  --rule: rgba(8, 21, 31, 0.3);
+  --rule-hi: #08151f;
+  --rule-glow: rgba(8, 21, 31, 0.28);
   --veil: rgba(20, 73, 107, 0.05);
   --panel-fill: linear-gradient(180deg, rgba(20, 73, 107, 0.05), rgba(20, 73, 107, 0.02));
   --panel-shadow: 0 24px 60px rgba(20, 73, 107, 0.12);
@@ -95,6 +104,9 @@
   --hairline: rgba(224, 27, 36, 0.12);
   --muted: #c07878;
   --nav-fill: rgba(0, 0, 0, 0.86);
+  --rule: rgba(255, 255, 255, 0.38);
+  --rule-hi: #ffffff;
+  --rule-glow: rgba(255, 255, 255, 0.45);
   --veil: rgba(224, 27, 36, 0.06);
   --panel-fill: linear-gradient(180deg, rgba(224, 27, 36, 0.06), rgba(224, 27, 36, 0.02));
   --panel-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);

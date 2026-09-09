@@ -11,33 +11,6 @@
     />
     <link rel="icon" type="image/jpeg" href="gojored.jpg" />
 
-    <!-- Applied before first paint so a stored technique theme never flashes
-         the default palette on reload. Keep in sync with assets/js/theme.js. -->
-    <script>
-      (function () {
-        var SCHEME = { sakura: "light", void: "light", sharingan: "dark" };
-        var name = "default";
-        try {
-          var stored = localStorage.getItem("pd-theme");
-          if (SCHEME[stored]) name = stored;
-        } catch (error) {}
-        var root = document.documentElement;
-        root.setAttribute("data-theme", name);
-        root.style.colorScheme = SCHEME[name] || "dark";
-
-        // Fallback release. This snippet always runs, so it can leave a theme
-        // applied even if the module never loads -- which would otherwise
-        // strand someone in a palette with no way back. The module claims the
-        // control when it boots and this steps aside.
-        document.addEventListener("click", function (event) {
-          if (window.__pdThemeReady || !event.target.closest) return;
-          if (!event.target.closest("[data-theme-release]")) return;
-          try { localStorage.removeItem("pd-theme"); } catch (error) {}
-          root.setAttribute("data-theme", "default");
-          root.style.colorScheme = "dark";
-        });
-      })();
-    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

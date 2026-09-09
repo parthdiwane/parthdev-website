@@ -223,16 +223,16 @@ export class BleachRenderer {
     this.bloom = 1;
   }
 
-  /* Each incantation glyph hands back its rect and breaks into a small
-     cluster of petals thrown off its own position. */
+  /* Each incantation word hands back its rect and breaks into a cluster of
+     petals thrown off its own position. */
   disperse(rects) {
-    const perGlyph = 14;
-
     rects.forEach((rect) => {
       const x = rect.left + rect.width / 2;
       const y = rect.top + rect.height / 2;
+      /* a word throws off a cluster proportional to its own width */
+      const count = clamp(Math.round(rect.width / 4), 12, 110);
 
-      for (let i = 0; i < perGlyph; i += 1) {
+      for (let i = 0; i < count; i += 1) {
         const petal = this.makePetal(Math.random() < 0.3 ? "near" : "mid");
         const angle = rand(0, TAU);
         const speed = rand(90, 460);

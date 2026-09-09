@@ -10,19 +10,6 @@
       content="Personal writing by Parth Diwane, sorted by date."
     />
     <link rel="icon" type="image/jpeg" href="../gojored.jpg" />
-    <script>
-      (function () {
-        var SCHEME = { sakura: "light", void: "light", sharingan: "dark" };
-        var name = "default";
-        try {
-          var stored = localStorage.getItem("pd-theme");
-          if (SCHEME[stored]) name = stored;
-        } catch (error) {}
-        var root = document.documentElement;
-        root.setAttribute("data-theme", name);
-        root.style.colorScheme = SCHEME[name] || "dark";
-      })();
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -11,7 +11,8 @@ export const CONFIGS = {
     name: "Senbonzakura Kageyoshi",
     core: "#FF9EC4",
     halo: "rgba(255,158,196,.4)",
-    stagger: 45,
+    /* 3 words across 2300ms -- 790ms apart, held long enough to read */
+    incantMs: 2300,
     technique: 3200,
     disperseAt: 0.4,
     disperse: "shatter",
@@ -26,7 +27,8 @@ export const CONFIGS = {
     name: "Infinite Void",
     core: "#7FD4FF",
     halo: "rgba(127,212,255,.45)",
-    stagger: 45,
+    /* 4 words across 2900ms -- 727ms apart */
+    incantMs: 2900,
     technique: 2800,
     disperseAt: 0.4,
     disperse: "implode",
@@ -43,7 +45,6 @@ export const CONFIGS = {
     name: null,
     core: "#FF4D4D",
     halo: "rgba(224,27,36,.45)",
-    stagger: 30,
     holdMs: 300,
     technique: 2400,
     disperseAt: 0.4,

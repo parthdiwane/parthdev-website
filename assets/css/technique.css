@@ -111,40 +111,18 @@ html:not(.js-technique) .tech-trigger::after {
   display: none;
 }
 
-.tech-trigger[data-technique="bleach"] {
-  --tc: #c4718f;
-  --tc-hi: #ff9ec4;
-  --tc-glow: rgba(255, 158, 196, 0.55);
+/* All three share one neutral rule -- white on the dark palettes, the theme's
+   own ink on the light ones where white would vanish. The show colours belong
+   to the sequences, not to the sentence. */
+.tech-trigger {
+  --tc: var(--rule);
+  --tc-hi: var(--rule-hi);
+  --tc-glow: var(--rule-glow);
 }
 
-.tech-trigger[data-technique="bleach"]:hover,
-.tech-trigger[data-technique="bleach"]:focus-visible {
-  --tc: #ff9ec4;
-  --tc-hi: #ffd9e7;
-}
-
-.tech-trigger[data-technique="jjk"] {
-  --tc: #5e9cbe;
-  --tc-hi: #7fd4ff;
-  --tc-glow: rgba(127, 212, 255, 0.55);
-}
-
-.tech-trigger[data-technique="jjk"]:hover,
-.tech-trigger[data-technique="jjk"]:focus-visible {
-  --tc: #7fd4ff;
-  --tc-hi: #d3f1ff;
-}
-
-.tech-trigger[data-technique="naruto"] {
-  --tc: #b84a4a;
-  --tc-hi: #ff4d4d;
-  --tc-glow: rgba(224, 27, 36, 0.6);
-}
-
-.tech-trigger[data-technique="naruto"]:hover,
-.tech-trigger[data-technique="naruto"]:focus-visible {
-  --tc: #ff4d4d;
-  --tc-hi: #ffb0b0;
+.tech-trigger:hover,
+.tech-trigger:focus-visible {
+  --tc: var(--rule-hi);
 }
 
 /* --------------------------------------------------------------------------
@@ -167,7 +145,7 @@ html.is-sequence body {
   overflow: hidden;
 }
 
-html.is-paused .incant .glyph {
+html.is-paused .incant .incant__word {
   animation-play-state: paused;
 }
 
@@ -248,9 +226,14 @@ html.is-dissolved .dissolve-unit {
 
 /* Sized just above body copy. The site's own face carries it, so the
    incantation reads as this page raising its voice rather than as a
-   title card borrowed from somewhere else. */
+   title card borrowed from somewhere else.
+
+   Tracking hangs a gap off the last character, which would sit the line left
+   of centre. It is static now, so a matching negative margin cancels it
+   exactly. */
 .incant__line--word {
-  --tracking: 0.22em;
+  letter-spacing: 0.22em;
+  margin-right: -0.22em;
   font-size: clamp(0.68rem, 1.5vw, 0.8rem);
   font-weight: 400;
   text-transform: uppercase;
@@ -258,61 +241,51 @@ html.is-dissolved .dissolve-unit {
 }
 
 .incant__line--name {
-  --tracking: 0.02em;
-  font-size: clamp(0.85rem, 2.2vw, 1.25rem);
+  letter-spacing: 0.02em;
+  margin-right: -0.02em;
+  font-size: clamp(0.9rem, 2.3vw, 1.3rem);
   font-weight: 500;
 }
 
-.incant .glyph {
+/* Whole words, not characters. Each one settles as a unit and the next waits
+   its turn, so the phrase arrives at reading speed. */
+.incant__word {
   display: inline-block;
-  white-space: pre;
-  letter-spacing: var(--tracking, 0);
   opacity: 0;
   will-change: opacity, transform, filter;
 }
 
-/* letter-spacing hangs its gap AFTER the character, so the last glyph's share
-   pushes the whole line left of centre -- and it does so by a different amount
-   every frame while the tracking is collapsing. Zeroing it on the last glyph
-   keeps the line optically centred at every point in the reveal. */
-.incant .glyph:last-child {
-  --tracking: 0em;
-  --track-from: 0em;
+/* The stack is built during DISSOLVE so layout is already resolved; `is-live`
+   is what releases the reveal on the INCANT beat. */
+.incant.is-live .incant__word {
+  animation: word-in var(--word-dur, 720ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i) * var(--word-stagger, 780ms));
 }
 
-/* The stack is built during DISSOLVE so the font and layout are already
-   resolved; `is-live` is what releases the reveal on the INCANT beat. */
-.incant.is-live .glyph {
-  animation: glyph-in var(--glyph-dur, 520ms) cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: calc(var(--i) * var(--glyph-stagger, 45ms));
-}
-
-@keyframes glyph-in {
+@keyframes word-in {
   from {
     opacity: 0;
-    filter: blur(6px);
-    transform: translateY(9px);
-    letter-spacing: var(--track-from, 0.34em);
+    filter: blur(9px);
+    transform: translateY(11px) scale(0.985);
   }
 
   to {
     opacity: 1;
     filter: blur(0);
-    transform: translateY(0);
-    letter-spacing: var(--tracking, 0);
+    transform: none;
   }
 }
 
 /* --- dispersal, one per show ------------------------------------------- */
 
-/* Bleach: each glyph breaks up where it stands while the renderer spawns a
+/* Bleach: each word breaks up where it stands while the renderer spawns a
    petal cluster from its rect. */
-.incant.is-live.incant--shatter .glyph {
-  animation: glyph-shatter 560ms cubic-bezier(0.32, 0, 0.68, 0.6) both;
-  animation-delay: calc(var(--i) * 15ms);
+.incant.is-live.incant--shatter .incant__word {
+  animation: word-shatter 760ms cubic-bezier(0.32, 0, 0.68, 0.6) both;
+  animation-delay: calc(var(--i) * 120ms);
 }
 
-@keyframes glyph-shatter {
+@keyframes word-shatter {
   0% {
     opacity: 1;
     filter: blur(0);
@@ -333,12 +306,12 @@ html.is-dissolved .dissolve-unit {
 }
 
 /* JJK: pulled toward the vanishing point, accelerating, blur climbing. */
-.incant.is-live.incant--implode .glyph {
-  animation: glyph-implode 780ms cubic-bezier(0.55, 0, 0.85, 0.35) both;
-  animation-delay: calc(var(--i) * 7ms);
+.incant.is-live.incant--implode .incant__word {
+  animation: word-implode 900ms cubic-bezier(0.55, 0, 0.85, 0.35) both;
+  animation-delay: calc(var(--i) * 90ms);
 }
 
-@keyframes glyph-implode {
+@keyframes word-implode {
   0% {
     opacity: 1;
     filter: blur(0);

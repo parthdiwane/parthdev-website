@@ -19,13 +19,9 @@ const HOLD_MS = 500;
 const WASH_MS = 800;
 const RETURN_MS = 900;
 
-/* One glyph's reveal. The per-character stagger is compressed from the config
-   value only as far as it has to be for the last glyph to land inside INCANT. */
-const GLYPH_MS = 440;
-
-/* Empty slots held between two lines, so the second one starts after a beat
-   rather than treading on the last character of the first. */
-const LINE_PAUSE = 5;
+/* One word's fade. The gap between words is derived from the configured
+   INCANT window so the phrase always fills it -- slow enough to read. */
+const WORD_MS = 720;
 
 /* Long frames (tab throttling, a GC pause) are clamped rather than integrated,
    so a stall slows the sequence down instead of teleporting through it. */
@@ -45,22 +41,26 @@ const UNIT_SELECTOR = [
   ".contact",
 ].join(",");
 
-/* One span per code point, so "Mangekyō Sharingan" splits into glyphs and not
-   into UTF-16 halves. Spaces keep their slot -- as a non-breaking space,
-   written escaped so it stays visible in source -- so the tracking collapse
-   stays evenly paced across the whole line. */
-const splitGlyphs = (text, startIndex) => {
+const wordsOf = (text) => text.split(/\s+/).filter(Boolean);
+
+/* One span per word. The separating spaces stay as plain text nodes so they
+   are never animated and never collapse. */
+const splitWords = (text, startIndex) => {
   const fragment = document.createDocumentFragment();
   let index = startIndex;
 
-  for (const character of text) {
+  wordsOf(text).forEach((word, position) => {
+    if (position > 0) {
+      fragment.appendChild(document.createTextNode(" "));
+    }
+
     const span = document.createElement("span");
-    span.className = "glyph";
-    span.textContent = character === " " ? "\u00a0" : character;
+    span.className = "incant__word";
+    span.textContent = word;
     span.style.setProperty("--i", index);
     fragment.appendChild(span);
     index += 1;
-  }
+  });
 
   return { fragment, next: index };
 };
@@ -81,7 +81,7 @@ export class Orchestrator {
     this.ctx = null;
     this.renderer = null;
     this.incant = null;
-    this.glyphs = [];
+    this.words = [];
     this.units = [];
     this.origin = null;
     this.dispersed = false;
@@ -321,15 +321,14 @@ export class Orchestrator {
     const lines = config.word ? [config.word, config.name] : [config.name];
     const window_ = config.incantMs ?? INCANT_MS;
 
-    /* Glyph indices run continuously across both lines, so line two only
-       begins once line one has finished assembling. The stagger is squeezed
-       to whatever lets the last character still land inside INCANT. */
-    const slots =
-      lines.reduce((total, line) => total + [...line].length, 0) + (lines.length - 1) * LINE_PAUSE;
-    const gap = Math.min(config.stagger, (window_ - GLYPH_MS) / Math.max(1, slots - 1));
+    /* Word indices run continuously across both lines, so nothing starts until
+       the word before it has settled. The gap is whatever spreads them evenly
+       across the INCANT window. */
+    const count = lines.reduce((total, line) => total + wordsOf(line).length, 0);
+    const gap = (window_ - WORD_MS) / Math.max(1, count - 1);
 
-    host.style.setProperty("--glyph-dur", `${GLYPH_MS}ms`);
-    host.style.setProperty("--glyph-stagger", `${gap.toFixed(2)}ms`);
+    host.style.setProperty("--word-dur", `${WORD_MS}ms`);
+    host.style.setProperty("--word-stagger", `${gap.toFixed(1)}ms`);
 
     let index = 0;
 
@@ -338,9 +337,9 @@ export class Orchestrator {
       line.className =
         "incant__line " + (config.word && lineIndex === 0 ? "incant__line--word" : "incant__line--name");
 
-      const { fragment, next } = splitGlyphs(text, index);
+      const { fragment, next } = splitWords(text, index);
       line.appendChild(fragment);
-      index = next + LINE_PAUSE;
+      index = next;
       stack.appendChild(line);
     });
 
@@ -348,7 +347,7 @@ export class Orchestrator {
     document.body.appendChild(host);
 
     this.incant = host;
-    this.glyphs = Array.from(host.querySelectorAll(".glyph"));
+    this.words = Array.from(host.querySelectorAll(".incant__word"));
   }
 
   disperse() {
@@ -361,17 +360,17 @@ export class Orchestrator {
     const mode = this.active.disperse;
 
     /* Read every rect before writing anything back, so this costs one layout
-       instead of one per glyph. */
-    const rects = this.glyphs.map((glyph) => glyph.getBoundingClientRect());
+       instead of one per word. */
+    const rects = this.words.map((word) => word.getBoundingClientRect());
 
     if (mode === "implode") {
       const cx = window.innerWidth / 2;
       const cy = window.innerHeight / 2;
 
-      this.glyphs.forEach((glyph, index) => {
+      this.words.forEach((word, index) => {
         const rect = rects[index];
-        glyph.style.setProperty("--dx", `${((cx - (rect.left + rect.width / 2)) * 0.92).toFixed(1)}px`);
-        glyph.style.setProperty("--dy", `${((cy - (rect.top + rect.height / 2)) * 0.92).toFixed(1)}px`);
+        word.style.setProperty("--dx", `${((cx - (rect.left + rect.width / 2)) * 0.92).toFixed(1)}px`);
+        word.style.setProperty("--dy", `${((cy - (rect.top + rect.height / 2)) * 0.92).toFixed(1)}px`);
       });
     }
 
@@ -382,7 +381,7 @@ export class Orchestrator {
   removeIncant() {
     this.incant?.remove();
     this.incant = null;
-    this.glyphs = [];
+    this.words = [];
   }
 
   /* -------------------------------------------------------------- canvas */
