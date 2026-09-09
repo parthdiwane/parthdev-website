@@ -1,60 +1,83 @@
-const internalLinks = document.querySelectorAll('a[href^="#"]');
-const revealElements = document.querySelectorAll(".reveal");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const siteHeader = document.getElementById("site-header");
-const siteHeaderInner = document.getElementById("site-header-inner");
-const siteNav = document.getElementById("site-nav");
+const navLinks = Array.from(document.querySelectorAll('.nav__link[href^="#"]'));
+const revealElements = Array.from(document.querySelectorAll(".reveal"));
+const preloader = document.getElementById("preloader");
+const preloaderBar = document.getElementById("preloader-bar");
 
-revealElements.forEach((element) => {
-  element.style.opacity = "0";
-  element.style.transform = "translateY(24px)";
-  element.style.transition = "opacity 700ms ease-out, transform 700ms ease-out";
-});
+/* ---------- terminal-style character scramble ---------- */
 
-internalLinks.forEach((link) => {
-  link.addEventListener("click", (event) => {
-    const targetId = link.getAttribute("href");
-    const target = document.querySelector(targetId);
+const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!<>-_/\\[]{}=+*^?#$%&";
+const randomGlyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
 
-    if (!target) {
-      return;
+/* Walks an element's text nodes and settles them left-to-right, leaving
+   the not-yet-settled characters churning through random glyphs. */
+const scramble = (element) => {
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  const parts = [];
+  let node;
+
+  while ((node = walker.nextNode())) {
+    if (node.nodeValue.trim()) {
+      parts.push({ node, text: node.nodeValue });
     }
+  }
 
-    event.preventDefault();
-    target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-    history.replaceState(null, "", targetId);
-  });
-});
+  const total = parts.reduce((sum, part) => sum + part.text.length, 0);
 
-const syncHeaderState = () => {
-  if (!siteHeader || !siteHeaderInner || !siteNav) {
+  if (!total) {
     return;
   }
 
-  const isCompact = window.scrollY > 24;
+  /* Finish in roughly 130 frames (~2s) regardless of how much text there is. */
+  const perFrame = total / 130;
+  let progress = 0;
 
-  siteHeaderInner.classList.toggle("py-4", !isCompact);
-  siteHeaderInner.classList.toggle("py-2", isCompact);
-  siteNav.classList.toggle("px-5", !isCompact);
-  siteNav.classList.toggle("py-3", !isCompact);
-  siteNav.classList.toggle("text-[0.92rem]", !isCompact);
-  siteNav.classList.toggle("gap-x-6", !isCompact);
-  siteNav.classList.toggle("px-4", isCompact);
-  siteNav.classList.toggle("py-2", isCompact);
-  siteNav.classList.toggle("text-[0.8rem]", isCompact);
-  siteNav.classList.toggle("gap-x-4", isCompact);
+  const step = () => {
+    progress += perFrame;
+    const settled = Math.floor(progress);
+    let offset = 0;
+
+    parts.forEach(({ node: textNode, text }) => {
+      let output = "";
+
+      for (let i = 0; i < text.length; i += 1) {
+        const character = text[i];
+        output += offset + i < settled || character.trim() === "" ? character : randomGlyph();
+      }
+
+      textNode.nodeValue = output;
+      offset += text.length;
+    });
+
+    if (settled < total) {
+      requestAnimationFrame(step);
+      return;
+    }
+
+    parts.forEach(({ node: textNode, text }) => {
+      textNode.nodeValue = text;
+    });
+  };
+
+  step();
 };
 
-syncHeaderState();
-window.addEventListener("scroll", syncHeaderState, { passive: true });
+/* ---------- reveal on scroll ---------- */
 
-if (reduceMotion) {
-  revealElements.forEach((element) => {
-    element.style.opacity = "1";
-    element.style.transform = "none";
-    element.style.transition = "none";
-  });
-} else {
+const show = (element) => {
+  element.classList.add("is-visible");
+
+  if (!reduceMotion) {
+    scramble(element);
+  }
+};
+
+const startReveals = () => {
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    revealElements.forEach((element) => element.classList.add("is-visible"));
+    return;
+  }
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -62,18 +85,96 @@ if (reduceMotion) {
           return;
         }
 
-        entry.target.style.opacity = "1";
-        entry.target.style.transform = "translateY(0)";
+        show(entry.target);
         observer.unobserve(entry.target);
       });
     },
-    {
-      threshold: 0.14,
-      rootMargin: "0px 0px -40px 0px",
-    }
+    { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
   );
 
-  revealElements.forEach((element) => {
-    observer.observe(element);
-  });
+  revealElements.forEach((element) => observer.observe(element));
+};
+
+/* ---------- preloader ---------- */
+
+const BAR_WIDTH = 28;
+
+const drawBar = (percent) => {
+  const filled = Math.round((percent / 100) * BAR_WIDTH);
+  const bar = "█".repeat(filled) + "░".repeat(BAR_WIDTH - filled);
+  preloaderBar.textContent = `[${bar}] ${String(Math.round(percent)).padStart(3, " ")}%`;
+};
+
+const finish = () => {
+  document.body.classList.remove("is-loading");
+  preloader.classList.add("is-done");
+  startReveals();
+  window.setTimeout(() => preloader.remove(), 500);
+};
+
+if (!preloader || !preloaderBar) {
+  startReveals();
+} else if (reduceMotion) {
+  finish();
+} else {
+  let percent = 0;
+  drawBar(0);
+
+  /* Uneven increments so it reads like a real terminal job, not a CSS animation. */
+  const tick = () => {
+    percent = Math.min(100, percent + Math.random() * 6 + 1.5);
+    drawBar(percent);
+
+    if (percent < 100) {
+      window.setTimeout(tick, Math.random() * 110 + 55);
+      return;
+    }
+
+    window.setTimeout(finish, 500);
+  };
+
+  window.setTimeout(tick, 120);
 }
+
+/* ---------- nav ---------- */
+
+navLinks.forEach((link) => {
+  link.addEventListener("click", (event) => {
+    const target = document.querySelector(link.getAttribute("href"));
+
+    if (!target) {
+      return;
+    }
+
+    event.preventDefault();
+    target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    history.replaceState(null, "", link.getAttribute("href"));
+  });
+});
+
+const sections = navLinks
+  .map((link) => document.querySelector(link.getAttribute("href")))
+  .filter(Boolean);
+
+const syncActiveLink = () => {
+  const marker = window.scrollY + window.innerHeight * 0.35;
+  let activeId = sections.length ? sections[0].id : null;
+
+  sections.forEach((section) => {
+    if (section.offsetTop <= marker) {
+      activeId = section.id;
+    }
+  });
+
+  navLinks.forEach((link) => {
+    if (link.getAttribute("href") === `#${activeId}`) {
+      link.setAttribute("aria-current", "true");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+};
+
+syncActiveLink();
+window.addEventListener("scroll", syncActiveLink, { passive: true });
+window.addEventListener("resize", syncActiveLink);
