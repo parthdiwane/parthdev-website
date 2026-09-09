@@ -1,9 +1,11 @@
-/* Dark-only. Kept for the writings/ pages, which use the Tailwind CDN. */
+/* Tailwind bridge for the writings/ pages. The palette itself lives in
+   theme.css; this only wires the CSS variables into Tailwind's colour names.
+
+   `data-theme` is owned by the technique themes (see assets/js/theme.js), so
+   this file must not write to it. */
 (() => {
   const root = document.documentElement;
   root.classList.add("dark");
-  root.style.colorScheme = "dark";
-  root.dataset.theme = "dark";
 
   window.tailwind = window.tailwind || {};
   window.tailwind.config = {
