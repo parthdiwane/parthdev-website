@@ -1,18 +1,158 @@
-/* Dark-only theme. No light mode. */
+/* ==========================================================================
+   Theme tokens
+
+   Every colour on the site resolves from the canonical set below:
+
+     --bg  --surface  --text  --heading  --accent  --border
+
+   A theme block only has to restate those six (plus a handful of derived
+   values that cannot be computed in CSS, like the translucent nav fill).
+   Everything else — including the legacy names the writings/ pages use —
+   is aliased off them further down, so nothing hardcodes a hex value.
+   ========================================================================== */
+
 :root {
   color-scheme: dark;
 
-  --bg: #232326;          /* gray shell */
-  --bg-soft: #1c1c1f;
-  --line: rgba(255, 255, 255, 0.07);
-  --line-strong: rgba(255, 255, 255, 0.14);
+  /* canonical */
+  --bg: #232326;
+  --surface: #1c1c1f;
+  --text: #8e8e95;
+  --heading: #adadb4;
+  --accent: #adadb4;
+  --border: rgba(255, 255, 255, 0.14);
 
-  --text: #8e8e95;        /* body */
-  --text-strong: #adadb4; /* headings / emphasis */
-  --text-dim: #6f6f76;    /* labels, meta */
+  /* derived-but-not-computable */
+  --hairline: rgba(255, 255, 255, 0.07);
+  --muted: #6f6f76;
+  --nav-fill: rgba(35, 35, 38, 0.85);
+  --rule: rgba(255, 255, 255, 0.4);
+  --rule-hi: #ffffff;
+  --rule-glow: rgba(255, 255, 255, 0.45);
+  --veil: rgba(255, 255, 255, 0.05);
+  --panel-fill: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  --panel-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  --vignette: none;
 
   --max: 720px;
   --nav-h: 62px;
+}
+
+/* --------------------------------------------------------------------------
+   sakura — Bleach / Senbonzakura Kageyoshi
+   -------------------------------------------------------------------------- */
+:root[data-theme="sakura"] {
+  color-scheme: light;
+
+  --bg: #ffffff;
+  --surface: #fff2f7;
+  --text: #d81b60; /* 4.95:1 on white -- the lightest true pink that clears AA */
+  --heading: #ad1457;
+  --accent: #ff8fb4;
+  --border: rgba(216, 27, 96, 0.18);
+
+  --hairline: rgba(216, 27, 96, 0.1);
+  --muted: #9b5570;
+  --nav-fill: rgba(255, 255, 255, 0.86);
+  --rule: rgba(20, 6, 12, 0.3);
+  --rule-hi: #14060c;
+  --rule-glow: rgba(20, 6, 12, 0.28);
+  --veil: rgba(216, 27, 96, 0.05);
+  --panel-fill: linear-gradient(180deg, rgba(216, 27, 96, 0.05), rgba(216, 27, 96, 0.02));
+  --panel-shadow: 0 24px 60px rgba(216, 27, 96, 0.12);
+  --vignette: none;
+}
+
+/* --------------------------------------------------------------------------
+   void — Jujutsu Kaisen / Infinite Void
+   -------------------------------------------------------------------------- */
+:root[data-theme="void"] {
+  color-scheme: light;
+
+  --bg: #f6fbff;
+  --surface: #e8f5fe;
+  --text: #0d3450;
+  --heading: #075273;
+  --accent: #4fc3f7;
+  --border: rgba(13, 52, 80, 0.18);
+
+  --hairline: rgba(13, 52, 80, 0.1);
+  --muted: #356279;
+  --nav-fill: rgba(246, 251, 255, 0.86);
+  --rule: rgba(8, 21, 31, 0.3);
+  --rule-hi: #08151f;
+  --rule-glow: rgba(8, 21, 31, 0.28);
+  --veil: rgba(20, 73, 107, 0.05);
+  --panel-fill: linear-gradient(180deg, rgba(20, 73, 107, 0.05), rgba(20, 73, 107, 0.02));
+  --panel-shadow: 0 24px 60px rgba(20, 73, 107, 0.12);
+  --vignette: none;
+}
+
+/* --------------------------------------------------------------------------
+   sharingan — Naruto / Eternal Mangekyou
+   -------------------------------------------------------------------------- */
+:root[data-theme="sharingan"] {
+  color-scheme: dark;
+
+  --bg: #000000;
+  --surface: #0b0b0b;
+  --text: #ff5a5a;
+  --heading: #f0353f; /* #E01B24 was 4.08:1 on --surface; this is 4.95:1 */
+  --accent: #ff3b30;
+  --border: rgba(224, 27, 36, 0.22);
+
+  --hairline: rgba(224, 27, 36, 0.12);
+  --muted: #c07878;
+  --nav-fill: rgba(0, 0, 0, 0.86);
+  --rule: rgba(255, 255, 255, 0.38);
+  --rule-hi: #ffffff;
+  --rule-glow: rgba(255, 255, 255, 0.45);
+  --veil: rgba(224, 27, 36, 0.06);
+  --panel-fill: linear-gradient(180deg, rgba(224, 27, 36, 0.06), rgba(224, 27, 36, 0.02));
+  --panel-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+  --vignette: none;
+}
+
+/* --------------------------------------------------------------------------
+   aliases — nothing below here should ever hold a literal colour
+   -------------------------------------------------------------------------- */
+:root {
+  --bg-soft: var(--surface);
+  --text-strong: var(--heading);
+  --text-dim: var(--muted);
+  --line: var(--hairline);
+  --line-strong: var(--border);
+
+  /* legacy tokens (writings/ pages) */
+  --ink: var(--heading);
+  --mist: var(--muted);
+  --bone: var(--bg);
+  --bone-soft: var(--surface);
+  --surface-muted: var(--veil);
+  --shadow-panel: var(--panel-shadow);
+  --bg-shell: var(--bg);
+  --bg-panel: var(--panel-fill);
+  --inverse: var(--heading);
+  --inverse-text: var(--bg);
+}
+
+/* Theme swaps ride a temporary blanket transition rather than a permanent one,
+   so the rest of the site pays nothing for it. No !important: the dissolve /
+   return rules in technique.css are deliberately more specific and win. */
+html.theme-shift,
+html.theme-shift *,
+html.theme-shift *::before,
+html.theme-shift *::after {
+  transition: background-color 400ms ease, background-image 400ms ease, color 400ms ease,
+    border-color 400ms ease, box-shadow 400ms ease, text-decoration-color 400ms ease,
+    outline-color 400ms ease, fill 400ms ease, stroke 400ms ease;
+}
+
+html.theme-shift--fast,
+html.theme-shift--fast *,
+html.theme-shift--fast *::before,
+html.theme-shift--fast *::after {
+  transition-duration: 300ms;
 }
 
 *,
@@ -41,6 +181,17 @@ body {
   line-height: 1.85;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* The sharingan theme keeps a faint red vignette; every other theme resolves
+   --vignette to `none`, which makes this layer a no-op. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background-image: var(--vignette);
 }
 
 body.is-loading {
@@ -89,7 +240,7 @@ body.is-loading {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(35, 35, 38, 0.85);
+  background: var(--nav-fill);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -318,20 +469,6 @@ strong {
   .wrap {
     padding: 0 20px 110px;
   }
-}
-
-/* ---------- legacy tokens (writings/ pages) ---------- */
-:root {
-  --ink: var(--text-strong);
-  --mist: var(--text-dim);
-  --bone: var(--bg);
-  --bone-soft: var(--bg-soft);
-  --surface-muted: rgba(255, 255, 255, 0.05);
-  --shadow-panel: 0 24px 60px rgba(0, 0, 0, 0.5);
-  --bg-shell: var(--bg);
-  --bg-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
-  --inverse: var(--text-strong);
-  --inverse-text: var(--bg);
 }
 
 [data-theme-toggle] {

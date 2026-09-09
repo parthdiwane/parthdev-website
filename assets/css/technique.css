@@ -1,0 +1,406 @@
+/* ==========================================================================
+   Technique sequences — triggers, incantation typography, dissolve / return,
+   canvas layer, footer controls.
+
+   Loaded after theme.css so the dissolve rules win the cascade over .reveal.
+   ========================================================================== */
+
+/* Registered so the underline colour can actually interpolate on hover, and
+   inheriting so ::after (the glow bar) resolves the same value the button has.
+   Browsers without @property still get the colour change, just instantly. */
+@property --tc {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #888888;
+}
+
+@property --tc-hi {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #cccccc;
+}
+
+/* --------------------------------------------------------------------------
+   triggers
+   -------------------------------------------------------------------------- */
+
+.tech-trigger {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0 0 3px;
+  border: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  font: inherit;
+  line-height: 1; /* keeps the inline-block out of the paragraph's line box */
+  vertical-align: baseline;
+  color: var(--text-strong);
+  cursor: inherit;
+  text-shadow: 0 0 0 transparent;
+
+  /* the 2px underline itself */
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--tc) 16%,
+    var(--tc-hi) 50%,
+    var(--tc) 84%,
+    transparent 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 0;
+  background-position: 0 100%;
+
+  transition: color 180ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    text-shadow 180ms cubic-bezier(0.2, 0.7, 0.3, 1), --tc 180ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    --tc-hi 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* the glow, blurred underneath the crisp line */
+.tech-trigger::after {
+  content: "";
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--tc-hi) 22%, var(--tc-hi) 78%, transparent 100%);
+  opacity: 0;
+  filter: blur(4px);
+  pointer-events: none;
+  transition: opacity 180ms cubic-bezier(0.2, 0.7, 0.3, 1), filter 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.tech-trigger:hover,
+.tech-trigger:focus-visible {
+  color: var(--tc-hi);
+  text-shadow: 0 0 10px var(--tc-glow);
+}
+
+.tech-trigger:hover::after,
+.tech-trigger:focus-visible::after {
+  opacity: 0.9;
+  filter: blur(5px);
+}
+
+.tech-trigger:focus-visible {
+  outline: 2px solid var(--tc-hi);
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+.tech-trigger[disabled] {
+  pointer-events: none;
+}
+
+/* The affordance only appears once the module that honours it has booted.
+   Without it these are plain words in the sentence, not dead buttons. */
+html.js-technique .tech-trigger {
+  background-size: 100% 2px;
+  cursor: pointer;
+}
+
+html:not(.js-technique) .tech-trigger {
+  display: inline;
+}
+
+html:not(.js-technique) .tech-trigger::after {
+  display: none;
+}
+
+/* All three share one neutral rule -- white on the dark palettes, the theme's
+   own ink on the light ones where white would vanish. The show colours belong
+   to the sequences, not to the sentence. */
+.tech-trigger {
+  --tc: var(--rule);
+  --tc-hi: var(--rule-hi);
+  --tc-glow: var(--rule-glow);
+}
+
+.tech-trigger:hover,
+.tech-trigger:focus-visible {
+  --tc: var(--rule-hi);
+}
+
+/* --------------------------------------------------------------------------
+   sequence chrome
+   -------------------------------------------------------------------------- */
+
+/* Scroll lock. Pinning the body rather than hiding html's overflow keeps the
+   page visually where it was -- otherwise it snaps to the top mid-dissolve,
+   while the content is still visible. --scrollbar-w replaces the width the
+   scrollbar gave up so nothing reflows. */
+html.is-sequence {
+  overflow: hidden;
+}
+
+html.is-sequence body {
+  position: fixed;
+  top: var(--lock-top, 0px);
+  left: 0;
+  right: var(--scrollbar-w, 0px);
+  overflow: hidden;
+}
+
+html.is-paused .incant .incant__word {
+  animation-play-state: paused;
+}
+
+html.is-sequence .page {
+  transform: translate3d(var(--shake-x, 0px), var(--shake-y, 0px), 0) scale(var(--ghost-scale, 1));
+}
+
+/* Beat 1 of the domain expansion: the page comes back as a warped ghost for
+   the bubble to swallow, instead of being flatly absent. */
+.page--ghost {
+  opacity: var(--ghost-o, 1);
+  filter: blur(var(--ghost-blur, 0px)) saturate(0.3) brightness(1.35);
+}
+
+.dissolve-unit {
+  will-change: opacity, filter;
+}
+
+html.is-sequence .dissolve-unit {
+  transition: opacity var(--dsv-dur, 340ms) var(--dsv-ease, cubic-bezier(0.4, 0, 0.6, 0.15)),
+    filter var(--dsv-dur, 340ms) var(--dsv-ease, cubic-bezier(0.4, 0, 0.6, 0.15));
+  transition-delay: var(--dsv-delay, 0ms);
+}
+
+html.is-dissolved .dissolve-unit {
+  opacity: var(--dsv-floor, 0);
+  filter: blur(6px);
+}
+
+.technique-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  opacity: 1;
+  will-change: opacity;
+}
+
+.technique-canvas.is-washing {
+  opacity: 0;
+  transition: opacity var(--wash-dur, 800ms) cubic-bezier(0.35, 0, 0.65, 1);
+}
+
+/* --------------------------------------------------------------------------
+   incantation
+   -------------------------------------------------------------------------- */
+
+.incant {
+  position: fixed;
+  inset: 0;
+  z-index: 92;
+  display: grid;
+  place-items: center;
+  padding: 0 5vw;
+  pointer-events: none;
+  text-align: center;
+  font-family: inherit;
+  color: var(--inc-core);
+  -webkit-font-smoothing: antialiased;
+}
+
+.incant__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.5rem, 1.6vw, 1.1rem);
+  max-width: 100%;
+}
+
+.incant__line {
+  margin: 0;
+  line-height: 1.35;
+  text-shadow: 0 0 3px var(--inc-core), 0 0 10px var(--inc-core), 0 0 28px var(--inc-halo);
+}
+
+/* Sized just above body copy. The site's own face carries it, so the
+   incantation reads as this page raising its voice rather than as a
+   title card borrowed from somewhere else.
+
+   Tracking hangs a gap off the last character, which would sit the line left
+   of centre. It is static now, so a matching negative margin cancels it
+   exactly. */
+.incant__line--word {
+  letter-spacing: 0.22em;
+  margin-right: -0.22em;
+  font-size: clamp(0.68rem, 1.5vw, 0.8rem);
+  font-weight: 400;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.incant__line--name {
+  letter-spacing: 0.02em;
+  margin-right: -0.02em;
+  font-size: clamp(0.9rem, 2.3vw, 1.3rem);
+  font-weight: 500;
+}
+
+/* Whole words, not characters. Each one settles as a unit and the next waits
+   its turn, so the phrase arrives at reading speed. */
+.incant__word {
+  display: inline-block;
+  opacity: 0;
+  will-change: opacity, transform, filter;
+}
+
+/* The stack is built during DISSOLVE so layout is already resolved; `is-live`
+   is what releases the reveal on the INCANT beat. */
+.incant.is-live .incant__word {
+  animation: word-in var(--word-dur, 720ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i) * var(--word-stagger, 780ms));
+}
+
+@keyframes word-in {
+  from {
+    opacity: 0;
+    filter: blur(9px);
+    transform: translateY(11px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+/* --- dispersal, one per show ------------------------------------------- */
+
+/* Bleach: each word breaks up where it stands while the renderer spawns a
+   petal cluster from its rect. */
+.incant.is-live.incant--shatter .incant__word {
+  animation: word-shatter 760ms cubic-bezier(0.32, 0, 0.68, 0.6) both;
+  animation-delay: calc(var(--i) * 120ms);
+}
+
+@keyframes word-shatter {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+
+  35% {
+    opacity: 0.62;
+    filter: blur(1.5px);
+    transform: translateY(-2px) scale(1.03);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(-9px) scale(1.07);
+  }
+}
+
+/* JJK: pulled toward the vanishing point, accelerating, blur climbing. */
+.incant.is-live.incant--implode .incant__word {
+  animation: word-implode 900ms cubic-bezier(0.55, 0, 0.85, 0.35) both;
+  animation-delay: calc(var(--i) * 90ms);
+}
+
+@keyframes word-implode {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) scale(1);
+  }
+
+  60% {
+    opacity: 0.7;
+    filter: blur(5px);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(16px);
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(0.16);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   footer controls
+   -------------------------------------------------------------------------- */
+
+.site-foot {
+  margin: 0 auto;
+  max-width: var(--max);
+  padding: 0 24px 44px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .site-foot {
+    padding: 0 20px 52px;
+  }
+}
+
+.foot-ctl {
+  margin: 0;
+  padding: 2px 0;
+  border: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  color: var(--text-dim);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 180ms cubic-bezier(0.2, 0.7, 0.3, 1), color 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.foot-ctl:hover,
+.foot-ctl:focus-visible {
+  opacity: 1;
+  color: var(--text-strong);
+}
+
+.foot-ctl:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+/* Release is tied to the theme, never to the module: the pre-paint snippet in
+   <head> can apply a stored theme even if the module fails to load, and there
+   has to be a way back out of it in that case. */
+html:not([data-theme="sakura"]):not([data-theme="void"]):not([data-theme="sharingan"])
+  .foot-ctl--release {
+  display: none;
+}
+
+/* The sound toggle only means something while the module is live. */
+html:not(.js-technique) [data-sound-toggle] {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   reduced motion — the sequence never runs, so only the trigger affordance
+   and the footer need to stay sane.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .tech-trigger,
+  .tech-trigger::after,
+  .foot-ctl {
+    transition-duration: 1ms;
+  }
+}
