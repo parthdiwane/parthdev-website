@@ -10,16 +10,6 @@ const soundButton = document.querySelector("[data-sound-toggle]");
 
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-/* The incantation face is only used mid-sequence, where a swap would be
-   ruinous. Warm it now; the stylesheet requests it with display=block so a
-   slow network shows nothing rather than the fallback serif. */
-if (document.fonts) {
-  Promise.all([
-    document.fonts.load('500 20px "Shippori Mincho"'),
-    document.fonts.load('600 64px "Shippori Mincho"'),
-  ]).catch(() => {});
-}
-
 const orchestrator = triggers.length ? new Orchestrator({ configs: CONFIGS, triggers, page }) : null;
 
 /* Signals to the stylesheet that the sequence machinery is live, and stands

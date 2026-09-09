@@ -160,7 +160,7 @@ export class NarutoRenderer {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    ctx.fillStyle = "#070506";
+    ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, this.w, this.h);
 
     ctx.save();
@@ -463,7 +463,7 @@ export class NarutoRenderer {
     const aperture = this.R * 1.18 * open;
     const halfWidth = this.R * 1.85;
 
-    ctx.fillStyle = "#0C0A0B";
+    ctx.fillStyle = "#000000";
 
     /* upper */
     ctx.beginPath();

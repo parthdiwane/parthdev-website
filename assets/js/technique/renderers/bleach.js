@@ -18,7 +18,7 @@ const TAU = Math.PI * 2;
 
 const PALETTE = ["#FFD6E3", "#FFC2D4", "#FFA0BC", "#E8628C"];
 const SPARKLE = "#FFF4F8";
-const END_BG = parseHex("#FFF8FB");
+const END_BG = parseHex("#FFFFFF");
 
 const LIGHTEN_MS = 800; /* the blossoms are what turn the screen white */
 const THIN_MS = 620;

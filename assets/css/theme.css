@@ -41,19 +41,19 @@
 :root[data-theme="sakura"] {
   color-scheme: light;
 
-  --bg: #fff8fb;
-  --surface: #ffeff5;
-  --text: #8c2f52;
-  --heading: #c2185b;
+  --bg: #ffffff;
+  --surface: #fff2f7;
+  --text: #d81b60; /* 4.95:1 on white -- the lightest true pink that clears AA */
+  --heading: #ad1457;
   --accent: #ff8fb4;
-  --border: rgba(194, 24, 91, 0.18);
+  --border: rgba(216, 27, 96, 0.18);
 
-  --hairline: rgba(194, 24, 91, 0.1);
+  --hairline: rgba(216, 27, 96, 0.1);
   --muted: #9b5570;
-  --nav-fill: rgba(255, 248, 251, 0.86);
-  --veil: rgba(194, 24, 91, 0.05);
-  --panel-fill: linear-gradient(180deg, rgba(194, 24, 91, 0.05), rgba(194, 24, 91, 0.02));
-  --panel-shadow: 0 24px 60px rgba(194, 24, 91, 0.12);
+  --nav-fill: rgba(255, 255, 255, 0.86);
+  --veil: rgba(216, 27, 96, 0.05);
+  --panel-fill: linear-gradient(180deg, rgba(216, 27, 96, 0.05), rgba(216, 27, 96, 0.02));
+  --panel-shadow: 0 24px 60px rgba(216, 27, 96, 0.12);
   --vignette: none;
 }
 
@@ -65,13 +65,13 @@
 
   --bg: #f6fbff;
   --surface: #e8f5fe;
-  --text: #14496b;
-  --heading: #0b6e9e;
+  --text: #0d3450;
+  --heading: #075273;
   --accent: #4fc3f7;
-  --border: rgba(20, 73, 107, 0.15);
+  --border: rgba(13, 52, 80, 0.18);
 
-  --hairline: rgba(20, 73, 107, 0.09);
-  --muted: #3f7091;
+  --hairline: rgba(13, 52, 80, 0.1);
+  --muted: #356279;
   --nav-fill: rgba(246, 251, 255, 0.86);
   --veil: rgba(20, 73, 107, 0.05);
   --panel-fill: linear-gradient(180deg, rgba(20, 73, 107, 0.05), rgba(20, 73, 107, 0.02));
@@ -85,20 +85,20 @@
 :root[data-theme="sharingan"] {
   color-scheme: dark;
 
-  --bg: #0c0a0b;
-  --surface: #171214;
+  --bg: #000000;
+  --surface: #0b0b0b;
   --text: #ff5a5a;
-  --heading: #f0353f; /* spec value #E01B24 was 3.84:1 on --surface; see note */
+  --heading: #f0353f; /* #E01B24 was 4.08:1 on --surface; this is 4.95:1 */
   --accent: #ff3b30;
   --border: rgba(224, 27, 36, 0.22);
 
   --hairline: rgba(224, 27, 36, 0.12);
   --muted: #c07878;
-  --nav-fill: rgba(12, 10, 11, 0.86);
+  --nav-fill: rgba(0, 0, 0, 0.86);
   --veil: rgba(224, 27, 36, 0.06);
   --panel-fill: linear-gradient(180deg, rgba(224, 27, 36, 0.06), rgba(224, 27, 36, 0.02));
-  --panel-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
-  --vignette: radial-gradient(ellipse at center, transparent 55%, rgba(120, 0, 8, 0.18) 100%);
+  --panel-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+  --vignette: none;
 }
 
 /* --------------------------------------------------------------------------

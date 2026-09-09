@@ -37,15 +37,17 @@ export const CONFIGS = {
   naruto: {
     key: "naruto",
     theme: "sharingan",
-    /* single line, and harsher: 30ms between glyphs instead of 45 */
+    /* No incantation: the eye is the whole shot. INCANT is skipped and HOLD
+       shortened, so the black before the awakening is a beat, not dead air. */
     word: null,
-    name: "Eternal Mangekyō Sharingan",
+    name: null,
     core: "#FF4D4D",
     halo: "rgba(224,27,36,.45)",
     stagger: 30,
+    holdMs: 300,
     technique: 2400,
     disperseAt: 0.4,
-    disperse: "burn",
+    disperse: null,
     sound: true,
     create: (options) => new NarutoRenderer(options),
   },

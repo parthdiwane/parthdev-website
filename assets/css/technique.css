@@ -227,9 +227,7 @@ html.is-dissolved .dissolve-unit {
   padding: 0 5vw;
   pointer-events: none;
   text-align: center;
-  font-family: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Songti SC", Georgia,
-    "Times New Roman", serif;
-  font-weight: 600;
+  font-family: inherit;
   color: var(--inc-core);
   -webkit-font-smoothing: antialiased;
 }
@@ -244,26 +242,25 @@ html.is-dissolved .dissolve-unit {
 
 .incant__line {
   margin: 0;
-  line-height: 1.22;
-  text-shadow: 0 0 4px var(--inc-core), 0 0 14px var(--inc-core), 0 0 40px var(--inc-halo);
+  line-height: 1.35;
+  text-shadow: 0 0 3px var(--inc-core), 0 0 10px var(--inc-core), 0 0 28px var(--inc-halo);
 }
 
+/* Sized just above body copy. The site's own face carries it, so the
+   incantation reads as this page raising its voice rather than as a
+   title card borrowed from somewhere else. */
 .incant__line--word {
-  --tracking: 0.44em;
-  font-size: clamp(0.66rem, 2vw, 1rem);
-  font-weight: 500;
-  /* the tracking hangs a gap off the last glyph; pull it back so the line
-     still reads as optically centred */
-  margin-right: calc(var(--tracking) * -1);
+  --tracking: 0.22em;
+  font-size: clamp(0.68rem, 1.5vw, 0.8rem);
+  font-weight: 400;
   text-transform: uppercase;
-  opacity: 0.92;
+  opacity: 0.9;
 }
 
 .incant__line--name {
-  --tracking: 0.015em;
-  font-size: clamp(1.45rem, 6vw, 4.1rem);
-  font-weight: 600;
-  margin-right: calc(var(--tracking) * -1);
+  --tracking: 0.02em;
+  font-size: clamp(0.85rem, 2.2vw, 1.25rem);
+  font-weight: 500;
 }
 
 .incant .glyph {
@@ -272,6 +269,15 @@ html.is-dissolved .dissolve-unit {
   letter-spacing: var(--tracking, 0);
   opacity: 0;
   will-change: opacity, transform, filter;
+}
+
+/* letter-spacing hangs its gap AFTER the character, so the last glyph's share
+   pushes the whole line left of centre -- and it does so by a different amount
+   every frame while the tracking is collapsing. Zeroing it on the last glyph
+   keeps the line optically centred at every point in the reveal. */
+.incant .glyph:last-child {
+  --tracking: 0em;
+  --track-from: 0em;
 }
 
 /* The stack is built during DISSOLVE so the font and layout are already
@@ -284,9 +290,9 @@ html.is-dissolved .dissolve-unit {
 @keyframes glyph-in {
   from {
     opacity: 0;
-    filter: blur(10px);
-    transform: translateY(14px);
-    letter-spacing: 0.4em;
+    filter: blur(6px);
+    transform: translateY(9px);
+    letter-spacing: var(--track-from, 0.34em);
   }
 
   to {
@@ -321,8 +327,8 @@ html.is-dissolved .dissolve-unit {
 
   100% {
     opacity: 0;
-    filter: blur(8px);
-    transform: translateY(-12px) scale(1.08);
+    filter: blur(6px);
+    transform: translateY(-9px) scale(1.07);
   }
 }
 
@@ -348,37 +354,6 @@ html.is-dissolved .dissolve-unit {
     opacity: 0;
     filter: blur(16px);
     transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(0.16);
-  }
-}
-
-/* Naruto: a hard overexposure sweeps left to right and burns each glyph out. */
-.incant.is-live.incant--burn .glyph {
-  animation: glyph-burn 340ms cubic-bezier(0.7, 0, 0.9, 0.4) both;
-  animation-delay: calc(var(--i) * 17ms);
-}
-
-@keyframes glyph-burn {
-  0% {
-    opacity: 1;
-    color: var(--inc-core);
-    transform: none;
-    filter: blur(0);
-  }
-
-  18% {
-    opacity: 1;
-    color: #ffffff;
-    text-shadow: 0 0 6px #ffffff, 0 0 26px var(--inc-core), 0 0 64px var(--inc-halo);
-    transform: translateY(-1px) scale(1.045);
-    filter: blur(0);
-  }
-
-  100% {
-    opacity: 0;
-    color: #ffffff;
-    text-shadow: 0 0 2px transparent;
-    transform: translateY(3px) scale(0.97);
-    filter: blur(4px);
   }
 }
 

@@ -21,7 +21,11 @@ const RETURN_MS = 900;
 
 /* One glyph's reveal. The per-character stagger is compressed from the config
    value only as far as it has to be for the last glyph to land inside INCANT. */
-const GLYPH_MS = 520;
+const GLYPH_MS = 440;
+
+/* Empty slots held between two lines, so the second one starts after a beat
+   rather than treading on the last character of the first. */
+const LINE_PAUSE = 5;
 
 /* Long frames (tab throttling, a GC pause) are clamped rather than integrated,
    so a stall slows the sequence down instead of teleporting through it. */
@@ -45,9 +49,9 @@ const UNIT_SELECTOR = [
    into UTF-16 halves. Spaces keep their slot -- as a non-breaking space,
    written escaped so it stays visible in source -- so the tracking collapse
    stays evenly paced across the whole line. */
-const splitGlyphs = (text) => {
+const splitGlyphs = (text, startIndex) => {
   const fragment = document.createDocumentFragment();
-  let index = 0;
+  let index = startIndex;
 
   for (const character of text) {
     const span = document.createElement("span");
@@ -58,7 +62,7 @@ const splitGlyphs = (text) => {
     index += 1;
   }
 
-  return fragment;
+  return { fragment, next: index };
 };
 
 export class Orchestrator {
@@ -108,10 +112,12 @@ export class Orchestrator {
     this.paused = false;
     this.dispersed = false;
 
+    /* Naruto has no incantation, so it skips INCANT outright rather than
+       holding on a blank screen for one and a half seconds. */
     this.phases = [
       ["DISSOLVE", DISSOLVE_MS],
-      ["INCANT", INCANT_MS],
-      ["HOLD", HOLD_MS],
+      ["INCANT", config.name ? config.incantMs ?? INCANT_MS : 0],
+      ["HOLD", config.holdMs ?? HOLD_MS],
       ["TECHNIQUE", config.technique],
       ["WASH", WASH_MS],
       ["RETURN", RETURN_MS],
@@ -299,6 +305,10 @@ export class Orchestrator {
   /* ----------------------------------------------------------- incantation */
 
   buildIncant(config) {
+    if (!config.name) {
+      return;
+    }
+
     const host = document.createElement("div");
     host.className = "incant";
     host.setAttribute("aria-hidden", "true");
@@ -309,17 +319,28 @@ export class Orchestrator {
     stack.className = "incant__stack";
 
     const lines = config.word ? [config.word, config.name] : [config.name];
-    const longest = Math.max(...lines.map((line) => [...line].length));
-    const gap = Math.min(config.stagger, (INCANT_MS - GLYPH_MS) / Math.max(1, longest - 1));
+    const window_ = config.incantMs ?? INCANT_MS;
+
+    /* Glyph indices run continuously across both lines, so line two only
+       begins once line one has finished assembling. The stagger is squeezed
+       to whatever lets the last character still land inside INCANT. */
+    const slots =
+      lines.reduce((total, line) => total + [...line].length, 0) + (lines.length - 1) * LINE_PAUSE;
+    const gap = Math.min(config.stagger, (window_ - GLYPH_MS) / Math.max(1, slots - 1));
 
     host.style.setProperty("--glyph-dur", `${GLYPH_MS}ms`);
     host.style.setProperty("--glyph-stagger", `${gap.toFixed(2)}ms`);
+
+    let index = 0;
 
     lines.forEach((text, lineIndex) => {
       const line = document.createElement("p");
       line.className =
         "incant__line " + (config.word && lineIndex === 0 ? "incant__line--word" : "incant__line--name");
-      line.appendChild(splitGlyphs(text));
+
+      const { fragment, next } = splitGlyphs(text, index);
+      line.appendChild(fragment);
+      index = next + LINE_PAUSE;
       stack.appendChild(line);
     });
 
