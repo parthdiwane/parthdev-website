@@ -41,22 +41,24 @@ const UNIT_SELECTOR = [
   ".contact",
 ].join(",");
 
-const splitGlyphs = (text, startIndex) => {
+/* One span per code point, so "Mangekyō Sharingan" splits into glyphs and not
+   into UTF-16 halves. Spaces keep their slot -- as a non-breaking space,
+   written escaped so it stays visible in source -- so the tracking collapse
+   stays evenly paced across the whole line. */
+const splitGlyphs = (text) => {
   const fragment = document.createDocumentFragment();
-  let index = startIndex;
+  let index = 0;
 
   for (const character of text) {
     const span = document.createElement("span");
     span.className = "glyph";
-    span.textContent = character === " " ? " " : character;
-    /* Spaces still occupy a slot so the tracking collapse stays even, but
-       they do not need their own reveal beat. */
+    span.textContent = character === " " ? "\u00a0" : character;
     span.style.setProperty("--i", index);
     fragment.appendChild(span);
     index += 1;
   }
 
-  return { fragment, next: index };
+  return fragment;
 };
 
 export class Orchestrator {
@@ -153,6 +155,12 @@ export class Orchestrator {
   }
 
   step(dt) {
+    /* A frame queued before finish() ran would otherwise walk off the end of
+       the phase list, or read this.active after cleanup nulled it. */
+    if (!this.running) {
+      return;
+    }
+
     this.phaseTime += dt;
 
     /* A single long frame can span more than one phase; walk them all so the
